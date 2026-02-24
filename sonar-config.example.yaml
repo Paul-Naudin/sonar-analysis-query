@@ -1,0 +1,9 @@
+server:
+  url: "https://sonar.example.com"
+  token: "squ_xxxxxxxxxxxx"       # Generate at: <your-sonar-url>/account/security
+
+projects:
+  # Human-readable alias → SonarQube project key
+  # Run `sonar-report init` to generate this file interactively.
+  my-project: "com.example.my-project"
+  another:    "com.example.another-service"
