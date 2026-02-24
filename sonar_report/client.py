@@ -87,6 +87,7 @@ class SonarClient:
         """
         all_results: list[dict] = []
         page = 1
+        _warning_emitted = False
 
         while True:
             page_params = {**params, "ps": PAGE_SIZE, "p": page}
@@ -98,7 +99,7 @@ class SonarClient:
             paging = data.get("paging", {})
             total: int = paging.get("total", len(all_results))
 
-            if total > PAGINATION_WARNING_THRESHOLD:
+            if total > PAGINATION_WARNING_THRESHOLD and not _warning_emitted:
                 warnings.warn(
                     f"Result set exceeds {PAGINATION_WARNING_THRESHOLD} items (total={total}). "
                     "SonarQube caps pagination at 10 000 — some results may be missing. "
@@ -106,6 +107,7 @@ class SonarClient:
                     UserWarning,
                     stacklevel=2,
                 )
+                _warning_emitted = True
 
             # Stop when we've fetched everything
             if len(all_results) >= total or not results:

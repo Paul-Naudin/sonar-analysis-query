@@ -51,7 +51,7 @@ def get_new_issues(client: SonarClient, project_key: str, branch: str) -> dict:
     }
     issues = client.get_paginated("/api/issues/search", params, results_key="issues")
     return _build_report(
-        report_type="new_issues_main",
+        report_type=f"new_issues_{branch}",
         project_key=project_key,
         issues=issues,
         extra={"branch": branch},
@@ -69,7 +69,7 @@ def get_all_issues(client: SonarClient, project_key: str, branch: str) -> dict:
     }
     issues = client.get_paginated("/api/issues/search", params, results_key="issues")
     return _build_report(
-        report_type="all_issues_main",
+        report_type=f"all_issues_{branch}",
         project_key=project_key,
         issues=issues,
         extra={"branch": branch},
