@@ -233,3 +233,33 @@ def coverage_command(ctx: click.Context, project: str, pr_id: str | None) -> Non
         report = get_coverage(client, project_key, branch)
 
     _emit_json(report, ctx)
+
+
+# ---------------------------------------------------------------------------
+# uncovered-lines  (F6)
+# ---------------------------------------------------------------------------
+
+@cli.command("uncovered-lines")
+@click.argument("project")
+@click.option("--pr", "pr_id", default=None,
+              help="Pull request ID. If omitted, fetches main branch data.")
+@click.pass_context
+@_handle_client_errors
+def uncovered_lines_command(ctx: click.Context, project: str, pr_id: str | None) -> None:
+    """F6 — List every uncovered line with its source code, per file."""
+    from sonar_report.reports.coverage import get_uncovered_lines
+
+    config, client = _make_client(ctx)
+    project_key = config.resolve_project(project)
+
+    if pr_id:
+        if ctx.obj["verbose"]:
+            click.echo(f"[verbose] Fetching uncovered lines for {project_key} PR#{pr_id}", err=True)
+        report = get_uncovered_lines(client, project_key, pr_id=pr_id)
+    else:
+        branch = ctx.obj["branch"]
+        if ctx.obj["verbose"]:
+            click.echo(f"[verbose] Fetching uncovered lines for {project_key} on branch '{branch}'", err=True)
+        report = get_uncovered_lines(client, project_key, branch=branch)
+
+    _emit_json(report, ctx)
