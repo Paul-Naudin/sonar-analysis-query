@@ -263,3 +263,33 @@ def uncovered_lines_command(ctx: click.Context, project: str, pr_id: str | None)
         report = get_uncovered_lines(client, project_key, branch=branch)
 
     _emit_json(report, ctx)
+
+
+# ---------------------------------------------------------------------------
+# duplications  (F7)
+# ---------------------------------------------------------------------------
+
+@cli.command("duplications")
+@click.argument("project")
+@click.option("--pr", "pr_id", default=None,
+              help="Pull request ID. If omitted, fetches main branch data.")
+@click.pass_context
+@_handle_client_errors
+def duplications_command(ctx: click.Context, project: str, pr_id: str | None) -> None:
+    """F7 — Code duplication report: metrics + duplicated blocks per file."""
+    from sonar_report.reports.duplications import get_duplications
+
+    config, client = _make_client(ctx)
+    project_key = config.resolve_project(project)
+
+    if pr_id:
+        if ctx.obj["verbose"]:
+            click.echo(f"[verbose] Fetching duplications for {project_key} PR#{pr_id}", err=True)
+        report = get_duplications(client, project_key, pr_id=pr_id)
+    else:
+        branch = ctx.obj["branch"]
+        if ctx.obj["verbose"]:
+            click.echo(f"[verbose] Fetching duplications for {project_key} on branch '{branch}'", err=True)
+        report = get_duplications(client, project_key, branch=branch)
+
+    _emit_json(report, ctx)
